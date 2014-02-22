@@ -31,10 +31,26 @@
  		}
  		in.close();
 
- 		String result;
- 		result = response.substring(response.indexOf("\"body\":"),response.length());
-		result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
-		result = result.substring(0 , result.indexOf("\\u003C"));
- 		System.out.println(result);
+ 		int wordCounter=0;
+ 		String reader = response.toString();
+ 		String result, finalResult="";
+ 		while(wordCounter<300)
+ 		{
+ 			if(reader.contains("\"body\":"))
+ 			{
+ 				result = reader.substring(reader.indexOf("\"body\":"),reader.length());
+ 				reader = reader.substring(reader.indexOf("\"body\":")+6,reader.length());
+ 				result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
+				result = result.substring(0 , result.indexOf("\\u003C"));
+				result = result.replace("&#8217;","'");
+ 			}
+ 			else
+ 			{
+ 				break;
+ 			}
+			wordCounter += result.length();
+			finalResult = finalResult + result + "\n";
+ 		}
+ 		System.out.println(finalResult);
  	}
  }
