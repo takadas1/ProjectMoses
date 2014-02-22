@@ -13,7 +13,7 @@
  {
  	public static void main(String[] beans) throws Exception 
  	{
- 		String url = "http://api.tumblr.com/v2/blog/thefinenine.tumblr.com/posts/text?api_key=FmuYeCbdQesF76ah7RJDMHcYUvrzKV85gWTV0HwtD7JRChh71F";
+ 		String url = "http://api.tumblr.com/v2/blog/project-moses.tumblr.com/posts/text?api_key=FmuYeCbdQesF76ah7RJDMHcYUvrzKV85gWTV0HwtD7JRChh71F";
  		URL obj = new URL(url);
  		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
  		
@@ -33,7 +33,8 @@
 
  		String result;
  		result = response.substring(response.indexOf("\"body\":"),response.length());
-		result = result.substring(0 , result.indexOf("}"));
+		result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
+		result = result.substring(0 , result.indexOf("\\u003C"));
  		System.out.println(result);
  	}
  }
