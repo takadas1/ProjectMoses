@@ -1,0 +1,15 @@
+Project Moses
+
+Galaga-like
+Black/Space background, spaceship character
+Start screen/face calibration
+Health vs Lives (same shit) collision = lost life / health
+Level based?  Time based?
+Camera to dodge text falling down. Different sizes? Uniform?
+Type to eliminate text obstacles(laser/explosion)
+Text/Sound/Penalty for mistype?
+Use Tumblr to parse posts for text(white text black outline)
+Profile/Image post boss(Surrounded by post words, type them all out. then type entire post?)
+Score counter based on time/obstacles typed
+Post high score to tumblr on game over
+Pause game if face goes out of frame?
