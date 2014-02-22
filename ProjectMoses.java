@@ -1,7 +1,13 @@
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.opencv.core.Mat; 
 import org.opencv.core.MatOfRect;
@@ -22,6 +28,9 @@ public class ProjectMoses extends Frame implements Runnable
 	public static double xCoor=0;
 	public static double yCoor=0;
 	
+	static BufferedImage image;
+	
+	
 	
 	// Create the window and start the Thread
 	public ProjectMoses() throws FileNotFoundException
@@ -35,13 +44,15 @@ public class ProjectMoses extends Frame implements Runnable
 	
 	
     // Start the class thread and window
-	public static void main(String s[]) throws FileNotFoundException
+	public static void main(String s[]) throws IOException
 	{ 
 		ProjectMoses b=new ProjectMoses();	// Create Window
 	  b.setSize(new Dimension(1000,1000));		// Window Dimensions
 	  b.setTitle("Project Moses");			// Set Title of window
 	  b.setVisible(true);
 	  
+	  image = ImageIO.read(new File("./src/1618673_10202592362282896_402707144_s.jpg"));;
+
 	}
 	
 	// This Thread is used to run everything
@@ -61,6 +72,10 @@ public class ProjectMoses extends Frame implements Runnable
 				updateFace(faceDetector, webcam_image, capture);
 	
 				
+				// Enter Stuff Here
+				
+				
+				
 				
 				
 				
@@ -75,6 +90,10 @@ public class ProjectMoses extends Frame implements Runnable
 	  public void paint(Graphics g)
 	  { 
 		  g.fillOval((int)xCoor, (int)yCoor, 100, 100);
+		  g.drawImage(image, 500, 500, this);
+		  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
+		  g.drawString("HELg", 600, 600);
+		  g.drawRect(600, 550, 35*4, 50);
 	  }
 	
 	
@@ -94,7 +113,7 @@ public class ProjectMoses extends Frame implements Runnable
 			// Draw a bounding box around each face.
 			for (Rect rect : faceDetections.toArray()) 
 			{
-				xCoor = ((double)rect.x)/400*1000-100;
+				xCoor = -(((double)rect.x)/400*1000-100)+950;
 				yCoor = ((double)rect.y)/400*1000+500;
 				break;
 			}
