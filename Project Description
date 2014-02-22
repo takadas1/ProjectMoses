@@ -3,4 +3,28 @@ Names: Willian, Shotaro, Rob, Anderson, Andy, Rob, Graham
 Project Name: Project Moses
 
 Description:
-	Project Moses is an Android application game. It starts with the player specifying a Tumblr tag. Then, the player controls a spaceship as it moves through space with his or her face. As the spaceship moves through space, random words from the Tumblr tag will move down the screen. The player will then need to type the words in to destroy the random words before they reach the spaceship
+	Project Moses is an Android application game. It starts with the player specifying a Tumblr tag. Then, the player controls a spaceship as it moves through space with his or her face. As the spaceship moves through space, random words from the Tumblr tag will move down the screen. The player will then need to type the words in to destroy the random words before they reach the spaceship. 
+
+Technical Details:
+	Android SDK - Game will be implemented on the android platform
+	Tumblr API - Used to acquire the words that will serve as enemies in the game
+	OpenCV4Android - Used to get the coordinates of the face for the game using the camera
+
+
+OpenCV4Android - 
+	Will be implemented first in opencv for java, and then integrated into the android application. Using the CascadeClassifer object and haarcascade models with the webcam, we will find the detected face’s x and y coordinates. These coordinates will then be used to control the spaceship. The idea is that the game’s main class will check this module for the current coordinates of the face.
+
+Tumblr API - 
+	Create an application with an account on Tumblr.
+	Authenticate the application with the consumer values and secret.
+	Use the client object to retrieve data.
+	Data is represented in JSON format in http
+	Use a JSON parser to get the text of posts
+	The idea is that the player will specify a tag, of which will be used to retrieve the texts of posts. 
+	These posts in text will then be parsed for words, of which will then serve as the enemies.
+	
+Android SDK - 
+	Everything will be integrated into an Android application using this SDK.
+	We will draw the game objects onto the screen.
+	
+Game Mechanics - 
