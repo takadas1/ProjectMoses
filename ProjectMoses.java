@@ -45,7 +45,7 @@ public class ProjectMoses extends Frame implements Runnable
 	static Player player;
 	static boolean game = true;
 	static int score = 0;
-	static boolean boss = false, win = false, lose = false;
+	static boolean boss = false, win = false, lose = false, start = false;
 	static String bossImageFile = "./src/boss.jpg";
 	static int bossY=-1000;
 	static String expImageFile = "./src/explode.jpg";
@@ -125,6 +125,20 @@ public class ProjectMoses extends Frame implements Runnable
 			// Background Locations
 			back1 = -1000;
 			back2 = -3000;
+			
+			// Start Screen here
+
+				
+				while(!start)
+				{
+					updateFace(faceDetector, webcam_image, capture);	// Constantly update the location of the spaceship
+					repaint();
+					
+					if(xCoor >= 450) start = true;					
+				}
+
+			
+			
 			
 			// Play background music
 			Clip clip = null;
@@ -263,6 +277,16 @@ public class ProjectMoses extends Frame implements Runnable
 
 	public void paint(Graphics g)
 	  { 
+		  if(!start)
+		  {
+			  g.drawImage(backgroundImage1, 0, back1, 1000, 2100, this);
+			  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
+			  g.setColor(Color.white);
+			  g.drawString("Move Player Here ---->", 0, 900);
+			  g.drawRect(450, playerYcoor, playerSize, playerSize);
+		  }
+		  else
 		  if(game)
 		  {
 			  // Background Images
@@ -314,8 +338,8 @@ public class ProjectMoses extends Frame implements Runnable
 			  g.setColor(Color.white);
 			  g.drawString("GAME OVER", 100, 400);
 			  g.drawString("SCORE: " + Integer.toString(score), 100, 600);
-			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
-			  g.drawString("See Twitter for daily scores.", 100, 800);
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 30)); 
+			  g.drawString("See Twitter @ProjectMoses for daily scores.", 100, 800);
 
 		  }
 		  else if(win)
@@ -325,8 +349,8 @@ public class ProjectMoses extends Frame implements Runnable
 			  g.setColor(Color.white);
 			  g.drawString("YOU WIN!", 100, 400);
 			  g.drawString("SCORE: " + Integer.toString(score), 100, 600);
-			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
-			  g.drawString("See Twitter for daily scores.", 100, 800);
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 30)); 
+			  g.drawString("See Twitter @ProjectMoses for daily scores.", 100, 800);
 			  g.drawImage(playerImage, 400, 850, playerSize, playerSize, this);			  
 		  }
 
@@ -450,7 +474,7 @@ public class ProjectMoses extends Frame implements Runnable
 	// Boss Function Fight
 	public static void bossFunction() throws Exception
 	{
-		String str = "Hey, didn't think you'd win that easy did ya? Come at me brahhhhh. looooooong string. Let's see how fast you can type. lolol boom boooom Ahhhhhhhhh 1+1=window ????? Hey, didn't think you'd win that easy did ya? Come at me brahhhhh. looooooong string. Let's see how fast you can type. lolol boom boooom Ahhhhhhhhh 1+1=window ????? Hey, didn't think you'd win that easy did ya? Come at me brahhhhh. looooooong string.";
+		String str = "Hey, didn't think you'd win that easy did ya? Come at me brahhhhh. string. Let's see how fast you can type. lolol boom boooom Hey, didn't think you'd win that easy did ya? Come at me brahhhhh. lolol boom boooom Ahhhhhhhhh 1+1=window ";
 		readString(str); // <-- Change Boss STring?
 	}
 
@@ -493,3 +517,4 @@ public class ProjectMoses extends Frame implements Runnable
         Status status = twitter.updateStatus(statusUpdate);
 	}
 }
+
