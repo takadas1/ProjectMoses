@@ -1,8 +1,0 @@
-public class HTTPDriver{
-
-  public static void main(String[] beans) throws Exception{
-	HTTPGet test = new HTTPGet();
-	System.out.println(test.getShit());
-  }
-  
-}
