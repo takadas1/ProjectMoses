@@ -21,6 +21,14 @@ import org.opencv.core.Rect;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.objdetect.CascadeClassifier;
 
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
 
 public class ProjectMoses extends Frame implements Runnable
@@ -53,8 +61,15 @@ public class ProjectMoses extends Frame implements Runnable
 	static String backgroundImageFile = "./src/Space.jpg";
 	static int back1=0,back2=0;
 	
-	
-	
+	 // Input Variables
+    JTextArea inputText;
+    String testies = "";
+    InputReader read;
+    
+    
+    
+    
+    
 	// Create the window and start the Thread
 	public ProjectMoses() throws FileNotFoundException
 	{ 
@@ -76,6 +91,7 @@ public class ProjectMoses extends Frame implements Runnable
 	  backgroundImage1 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
 	  backgroundImage2 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
 
+
 	}
 	
 	// This Thread is used to run everything
@@ -86,43 +102,74 @@ public class ProjectMoses extends Frame implements Runnable
 		Mat webcam_image = new Mat(); 
 		VideoCapture capture = new VideoCapture(0); 
 		
+		//INPUT VARIABLES
+		read = new InputReader();
+		
 		// Capturing and face detection
 		// Can detect more than one face
 		if( capture.isOpened()) 
 		{ 
 			// Create Game Variables
 			player = new Player((int)xCoor, playerYcoor, playerSize, playerSize); // Create Player
-			start_time = System.currentTimeMillis();	// Set start time
+			
+			// Times are used to create enemies
+			start_time = System.currentTimeMillis();	// Set start time 
 			long timer = start_time;	// Timer for when enemy was last created
+			
+			// Background Locations
 			back1 = -1000;
 			back2 = -3000;
+			
+			// Play background music
 			playWav("./src/Party Rock Anthem.wav");
+			
+			
+			
+			
 			
 			// Game loop here
 			while(game) 
 			{ 
 				updateFace(faceDetector, webcam_image, capture);	// Constantly update the location of the spaceship
+				player.xCoor = (int) xCoor;	// Update player's x coordinate too
 				
 				try
 				{
 					for(Enemy enemy: enemies)	// Constantly update the location of each of the enemies
 					{
-						if(!enemy.alive) enemies.remove(enemy); // Check to see if they are alive
+						checkForCollision(enemy);	// Check for collision with player
+						if(!enemy.alive)
+						{
+							enemies.remove(enemy); // Check to see if they are alive
+							int rand = (int)((Math.random()*3)+1);
+							
+							switch(rand)	// Play a sound 
+							{
+								case 1: playWav("./src/boom1.wav");
+									break;
+								case 2: playWav("./src/boom2.wav");
+									break;
+								case 3: playWav("./src/boom3.wav");
+									break;
+							}
+							
+						}
 						enemy.updateCoor();
 						
 						if(enemy.yBlock > 1200) enemies.remove(enemy); // Check to see if they exceed boundaries
 					}
 				}catch (Exception ConcurrentModificationException){}	// Continue if this exception occurs
 				
-				
-				if(System.currentTimeMillis()-timer>2000)	// Create new enemy every 1 second
+				// Create new enemy every 1 second
+				if(System.currentTimeMillis()-timer>2000)
 				{
-					createEnemy("Here");
+					createEnemy("here");
 					timer = System.currentTimeMillis();
 				}
 				
+				checkForInput();
 				
-				
+		
 				
 				
 				
@@ -135,6 +182,9 @@ public class ProjectMoses extends Frame implements Runnable
 				
 				if(!player.alive) game = false;	// Break out of loop
 
+				// DO STUFF HERE AFTER PLAYER LOSES
+				
+				
 			}
 		} 
 	}
@@ -146,6 +196,10 @@ public class ProjectMoses extends Frame implements Runnable
 		  {
 			  g.drawImage(backgroundImage1, 0, back1, 1000, 2100, this);
 			  g.drawImage(backgroundImage2, 0, back2, 1000, 2100, this);
+			  
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
+			  g.setColor(Color.white);
+			  g.drawString("LIVES: ", 20, 100);
 			  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
 			  g.drawRect((int)xCoor, playerYcoor, playerSize, playerSize);
 			  
@@ -179,7 +233,7 @@ public class ProjectMoses extends Frame implements Runnable
 			cascade.detectMultiScale(image, faceDetections);
 						
 			xCoor = 0;
-			yCoor = 0;
+			yCoor = -1000;
 		
 			// Draw a bounding box around each face.
 			for (Rect rect : faceDetections.toArray()) 
@@ -187,9 +241,7 @@ public class ProjectMoses extends Frame implements Runnable
 				xCoor = -(((double)rect.x)/400*1000-100)+950;
 				yCoor = ((double)rect.y)/400*1000+500;
 				break;
-			}
-			
-			System.out.println(String.format("Detected %s faces: %s, %s", faceDetections.toArray().length, xCoor, yCoor));
+			}			
 		}
 	}
 	
@@ -224,4 +276,35 @@ public class ProjectMoses extends Frame implements Runnable
 	      }
 	  }
 
+	// Collision Logic - Rob
+	public void checkForCollision(Enemy input)
+	{
+		if(input.xBlock < (player.xCoor + player.width) &&
+		(input.yBlock + input.bHeight) > player.yCoor &&
+		(input.xBlock + input.bWidth) > player.xCoor &&
+		input.yBlock < (player.yCoor + player.height))
+		{
+			player.loseHealth();
+			input.destroy();	
+		}
+	}
+	
+	public void checkForInput()
+	{
+		String s = read.getString();
+		
+		if(s.equals(""))
+		{
+		}
+		else
+		{
+			for(Enemy e:enemies)
+			{
+				if((e.string).equals(s))
+				{
+					e.alive = false;
+				}
+			}
+		}
+	}
 }
