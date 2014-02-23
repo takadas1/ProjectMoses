@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,6 +52,7 @@ public class ProjectMoses extends Frame implements Runnable
 	static LinkedList <Enemy> enemies = new LinkedList<Enemy>();
 	static Player player;
 	static boolean game = true;
+	static int score = 0;
 	
 	// Timer for the Game Variables
 	static long start_time;
@@ -65,8 +67,8 @@ public class ProjectMoses extends Frame implements Runnable
     JTextArea inputText;
     String testies = "";
     InputReader read;
-    
-    
+	static LinkedList<String> list;
+
     
     
     
@@ -80,7 +82,7 @@ public class ProjectMoses extends Frame implements Runnable
 	}
 	
     // Start the class thread and window
-	public static void main(String s[]) throws IOException
+	public static void main(String s[]) throws Exception
 	{ 
 		ProjectMoses b=new ProjectMoses();	// Create Window
 	  b.setSize(new Dimension(1000,1000));		// Window Dimensions
@@ -90,7 +92,6 @@ public class ProjectMoses extends Frame implements Runnable
 	  playerImage = ImageIO.read(new File(playerImageFile)); // Create Player Image
 	  backgroundImage1 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
 	  backgroundImage2 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
-
 
 	}
 	
@@ -104,6 +105,12 @@ public class ProjectMoses extends Frame implements Runnable
 		
 		//INPUT VARIABLES
 		read = new InputReader();
+		try {
+			readTumblr();
+		} catch (Exception e) {
+
+		}
+		
 		
 		// Capturing and face detection
 		// Can detect more than one face
@@ -160,11 +167,16 @@ public class ProjectMoses extends Frame implements Runnable
 					}
 				}catch (Exception ConcurrentModificationException){}	// Continue if this exception occurs
 				
-				// Create new enemy every 1 second
-				if(System.currentTimeMillis()-timer>2000)
+				// Create new enemy every 2 seconds
+				if(System.currentTimeMillis()-timer>1000)
 				{
-					createEnemy("here");
+					if(!list.isEmpty())
+					{
+						createEnemy(list.getFirst());
+						list.remove(0);		
+					}
 					timer = System.currentTimeMillis();
+
 				}
 				
 				checkForInput();
@@ -200,6 +212,17 @@ public class ProjectMoses extends Frame implements Runnable
 			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
 			  g.setColor(Color.white);
 			  g.drawString("LIVES: ", 20, 100);
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 25)); 
+			  g.drawString("SCORE: " + Integer.toString(score), 750, 100);
+			  
+			  if(player!=null)
+			  {
+				  for(int i=0; i<player.lives; i++)
+				  {
+					  g.drawImage(playerImage, 40+40*i, 100, 30, 30, this);
+				  }
+			  }
+			  
 			  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
 			  g.drawRect((int)xCoor, playerYcoor, playerSize, playerSize);
 			  
@@ -214,8 +237,11 @@ public class ProjectMoses extends Frame implements Runnable
 			  }
 		  }
 		  else {
+			  g.drawImage(backgroundImage1, 0, 0, 1000, 2100, this);
 			  g.setFont(new Font("TimesRoman", Font.PLAIN, 100)); 
+			  g.setColor(Color.white);
 			  g.drawString("GAME OVER", 100, 500);
+			  g.drawString("SCORE: " + Integer.toString(score), 100, 700);
 		  }
 
 
@@ -289,6 +315,7 @@ public class ProjectMoses extends Frame implements Runnable
 		}
 	}
 	
+	// Works with Input Reader to check for its input
 	public void checkForInput()
 	{
 		String s = read.getString();
@@ -302,9 +329,25 @@ public class ProjectMoses extends Frame implements Runnable
 			{
 				if((e.string).equals(s))
 				{
+					score += e.words*5;
 					e.alive = false;
 				}
 			}
 		}
 	}
+
+	// Reading in data from tumblr
+	public static void readTumblr() throws Exception
+	{
+		String longString = HTTPGet.getPostsByBlog("project-moses.tumblr.com"); //project-moses.tumblr.com
+		Scanner scan = new Scanner(longString);
+		
+		list= new LinkedList<String>();
+		while(scan.next() != null)
+		{
+			list.add(scan.next().toLowerCase());
+		}
+
+	}
+
 }
