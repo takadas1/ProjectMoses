@@ -15,7 +15,7 @@ public class HTTPGet{
 	// Using wordCounter variable can return less than twenty posts.
 	// @return result a single massive string containing the text from all posts.
 	// @param urlName the name of the blog to be pulled down. 
-	public String getPostsByBlog(String urlName)throws Exception{
+	public static String getPostsByBlog(String urlName)throws Exception{
 		// Uses the urlName to get the tumblr blog from which posts will be extracted from. 
 		String url = "http://api.tumblr.com/v2/blog/"+urlName+"/posts/text?api_key=FmuYeCbdQesF76ah7RJDMHcYUvrzKV85gWTV0HwtD7JRChh71F";
 		URL obj = new URL(url);
@@ -59,7 +59,7 @@ public class HTTPGet{
 	// This method pulls down posts by their tags as opposed to all the posts from one blog
 	// @param tag is the tag of all the posts that will be pulled.
 	// @return result a single massive string containing the text from all posts.
-	public String getPostsByTag(String tag)throws Exception{
+	public static String getPostsByTag(String tag)throws Exception{
 		// Uses the urlName to get the tumblr blog from which posts will be extracted from. 
 		String url = "http://api.tumblr.com/v2/tagged?tag="+tag;
 		URL obj = new URL(url);
