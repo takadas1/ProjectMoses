@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -6,9 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
-
 import org.opencv.core.Mat; 
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
@@ -28,8 +29,13 @@ public class ProjectMoses extends Frame implements Runnable
 	public static double xCoor=0;
 	public static double yCoor=0;
 	
-	static BufferedImage image;
-	
+	// Game Variables
+	static BufferedImage playerImage;	// Player Image
+	static int playerSize = 100;
+	static int playerYcoor = 850;
+	static String playerImageFile = "./src/SpaceShip.jpg";
+	static Enemy enemy = new Enemy("Shit", 500, 500);
+	static LinkedList <Enemy> enemies = new LinkedList<Enemy>();
 	
 	
 	// Create the window and start the Thread
@@ -51,7 +57,7 @@ public class ProjectMoses extends Frame implements Runnable
 	  b.setTitle("Project Moses");			// Set Title of window
 	  b.setVisible(true);
 	  
-	  image = ImageIO.read(new File("./src/1618673_10202592362282896_402707144_s.jpg"));;
+	  playerImage = ImageIO.read(new File(playerImageFile)); // Create Player Image
 
 	}
 	
@@ -67,10 +73,22 @@ public class ProjectMoses extends Frame implements Runnable
 		// Can detect more than one face
 		if( capture.isOpened()) 
 		{ 
+			// Create Game Variables
+			Player player = new Player((int)xCoor, playerYcoor, playerSize, playerSize);;
+			
+			for(int i=0;i<5; i++)
+			{
+				enemies.add(new Enemy("LOL", i*50, i*100));
+			}
+			
+			
 			while( true ) 
 			{ 
 				updateFace(faceDetector, webcam_image, capture);
-	
+				for(Enemy enemy: enemies)
+				{
+					enemy.updateCoor();;
+				}
 				
 				// Enter Stuff Here
 				
@@ -80,8 +98,7 @@ public class ProjectMoses extends Frame implements Runnable
 				
 				
 				
-				
-				
+				removeAll();
 				repaint();	// Call Paint after Values have been set
 			} 
 		} 
@@ -89,11 +106,20 @@ public class ProjectMoses extends Frame implements Runnable
 	
 	  public void paint(Graphics g)
 	  { 
-		  g.fillOval((int)xCoor, (int)yCoor, 100, 100);
-		  g.drawImage(image, 500, 500, this);
-		  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
-		  g.drawString("HELg", 600, 600);
-		  g.drawRect(600, 550, 35*4, 50);
+		  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
+		  g.drawRect((int)xCoor, playerYcoor, playerSize, playerSize);
+		  
+		  
+		  for(Enemy enemy: enemies)
+		  {
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
+			  g.setColor(Color.gray);
+			  g.fillRect(enemy.xBlock, enemy.yBlock, enemy.bWidth, enemy.bHeight);
+			  g.setColor(Color.black);
+			  g.drawString(enemy.string, enemy.xCoor, enemy.yCoor);
+		  }
+
+
 	  }
 	
 	
