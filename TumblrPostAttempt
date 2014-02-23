@@ -1,0 +1,36 @@
+import com.tumblr.jumblr.JumblrClient;
+import com.tumblr.jumblr.types.Blog;
+import com.tumblr.jumblr.types.TextPost;
+import com.tumblr.jumblr.types.Post;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class App {
+
+  //Download Jumblr package.
+
+    public static void main(String[] args) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException 
+	{
+		final String consumerKey = "Q5fFcHbqCWWnwFz0WtX4GgQXnAJ16ntBHW0XEsUpnRhUE9FKRN";
+		final String consumerSecret = "vACWCJRT2bRGUaWo6NxBsp90BysVzW8exb2g9nLgjQgrA0EkrZ";
+		
+		
+	
+       JumblrClient client = new JumblrClient(consumerKey, consumerSecret);
+	   client.setToken("oauth_token", "oauth_token_secret"); //NEED TO DO THIS AND STUFF
+	   
+	   //Write the user's name
+	   String blogName = "project-moses.tumblr.com";
+	   TextPost post= client.newPost(blogName, QuotePost.class);
+	   post.setTitle("HURRAY!");
+	   post.setBody("It Worked!");
+	   post.save();
+
+    }
+
+}
