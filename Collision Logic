@@ -1,0 +1,18 @@
+
+//Logic for collision detection
+
+for(Enemy e : displayedEnemies)
+	checkForCollision(e);
+	
+public void checkForCollision(Enemy input)
+{
+	if(enemyX < (playerX + playerWidth) &&
+	(enemyY + enemyHeight) > playerY &&
+	(enemyX + enemyWidth) > playerX &&
+	enemyY < (playerY + playerHeight))
+	{
+		player.loseHealth();
+		deleteEnemy(input);
+	}
+}
+
