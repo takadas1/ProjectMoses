@@ -8,8 +8,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import org.opencv.core.Mat; 
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
@@ -36,6 +41,18 @@ public class ProjectMoses extends Frame implements Runnable
 	static String playerImageFile = "./src/SpaceShip.jpg";
 	static Enemy enemy = new Enemy("Shit", 500, 500);
 	static LinkedList <Enemy> enemies = new LinkedList<Enemy>();
+	static Player player;
+	static boolean game = true;
+	
+	// Timer for the Game Variables
+	static long start_time;
+	
+	// Background Variables for looping
+	static BufferedImage backgroundImage1; // Background Image1
+	static BufferedImage backgroundImage2; // Background Image2
+	static String backgroundImageFile = "./src/Space.jpg";
+	static int back1=0,back2=0;
+	
 	
 	
 	// Create the window and start the Thread
@@ -47,8 +64,6 @@ public class ProjectMoses extends Frame implements Runnable
 		flag=false;	
 	}
 	
-	
-	
     // Start the class thread and window
 	public static void main(String s[]) throws IOException
 	{ 
@@ -58,6 +73,8 @@ public class ProjectMoses extends Frame implements Runnable
 	  b.setVisible(true);
 	  
 	  playerImage = ImageIO.read(new File(playerImageFile)); // Create Player Image
+	  backgroundImage1 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
+	  backgroundImage2 = ImageIO.read(new File(backgroundImageFile)); // Create Background Image
 
 	}
 	
@@ -74,23 +91,36 @@ public class ProjectMoses extends Frame implements Runnable
 		if( capture.isOpened()) 
 		{ 
 			// Create Game Variables
-			Player player = new Player((int)xCoor, playerYcoor, playerSize, playerSize);;
+			player = new Player((int)xCoor, playerYcoor, playerSize, playerSize); // Create Player
+			start_time = System.currentTimeMillis();	// Set start time
+			long timer = start_time;	// Timer for when enemy was last created
+			back1 = -1000;
+			back2 = -3000;
+			playWav("./src/Party Rock Anthem.wav");
 			
-			for(int i=0;i<5; i++)
-			{
-				enemies.add(new Enemy("LOL", i*50, i*100));
-			}
-			
-			
-			while( true ) 
+			// Game loop here
+			while(game) 
 			{ 
-				updateFace(faceDetector, webcam_image, capture);
-				for(Enemy enemy: enemies)
+				updateFace(faceDetector, webcam_image, capture);	// Constantly update the location of the spaceship
+				
+				try
 				{
-					enemy.updateCoor();;
+					for(Enemy enemy: enemies)	// Constantly update the location of each of the enemies
+					{
+						if(!enemy.alive) enemies.remove(enemy); // Check to see if they are alive
+						enemy.updateCoor();
+						
+						if(enemy.yBlock > 1200) enemies.remove(enemy); // Check to see if they exceed boundaries
+					}
+				}catch (Exception ConcurrentModificationException){}	// Continue if this exception occurs
+				
+				
+				if(System.currentTimeMillis()-timer>2000)	// Create new enemy every 1 second
+				{
+					createEnemy("Here");
+					timer = System.currentTimeMillis();
 				}
 				
-				// Enter Stuff Here
 				
 				
 				
@@ -98,32 +128,47 @@ public class ProjectMoses extends Frame implements Runnable
 				
 				
 				
-				removeAll();
+				
+				
+				updateBackground();	// Update Background
 				repaint();	// Call Paint after Values have been set
-			} 
+				
+				if(!player.alive) game = false;	// Break out of loop
+
+			}
 		} 
 	}
 	
 	  public void paint(Graphics g)
 	  { 
-		  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
-		  g.drawRect((int)xCoor, playerYcoor, playerSize, playerSize);
 		  
-		  
-		  for(Enemy enemy: enemies)
+		  if(game)
 		  {
-			  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
-			  g.setColor(Color.gray);
-			  g.fillRect(enemy.xBlock, enemy.yBlock, enemy.bWidth, enemy.bHeight);
-			  g.setColor(Color.black);
-			  g.drawString(enemy.string, enemy.xCoor, enemy.yCoor);
+			  g.drawImage(backgroundImage1, 0, back1, 1000, 2100, this);
+			  g.drawImage(backgroundImage2, 0, back2, 1000, 2100, this);
+			  g.drawImage(playerImage, (int) xCoor, playerYcoor, playerSize, playerSize, this);
+			  g.drawRect((int)xCoor, playerYcoor, playerSize, playerSize);
+			  
+			  
+			  for(Enemy enemy: enemies)
+			  {
+				  g.setFont(new Font("TimesRoman", Font.PLAIN, 50)); 
+				  g.setColor(Color.gray);
+				  g.fillRect(enemy.xBlock, enemy.yBlock, enemy.bWidth, enemy.bHeight);
+				  g.setColor(Color.black);
+				  g.drawString(enemy.string, enemy.xCoor, enemy.yCoor);
+			  }
+		  }
+		  else {
+			  g.setFont(new Font("TimesRoman", Font.PLAIN, 100)); 
+			  g.drawString("GAME OVER", 100, 500);
 		  }
 
 
 	  }
 	
 	
-	
+	// Update the x,y coordinates of the face
 	public static void updateFace(CascadeClassifier cascade, Mat image, VideoCapture cap)
 	{
 		cap.read(image); 
@@ -148,5 +193,35 @@ public class ProjectMoses extends Frame implements Runnable
 		}
 	}
 	
+	// Helper method to create Enemies
+	public static void createEnemy(String s)
+	{
+		enemies.add(new Enemy(s, (int)(Math.random()*1000),-100));
+	}
+	
+	// Method called to move background
+	public static void updateBackground()
+	{
+		back1 = back1+50;
+		back2 = back2+50;
+		
+		if(back1 > 1000) back1 = -3000;
+		if(back2 > 1000) back2 = -3000;
+	}
+
+	// Play the WAV file given the file directory
+	public static void playWav(String fileName)
+	  {
+	      try
+	      {
+	          Clip clip = AudioSystem.getClip();
+	          clip.open(AudioSystem.getAudioInputStream(new File(fileName)));
+	          clip.start();
+	      }
+	      catch (Exception exc)
+	      {
+	          exc.printStackTrace(System.out);
+	      }
+	  }
 
 }
