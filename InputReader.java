@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 
 //Here's a class for a simple GUI that uses a JFrame
 //to hold to JTextAreas - one will listen for the key events
@@ -14,9 +13,10 @@ import javax.swing.JScrollPane;
 public class InputReader {
     
     JTextArea inputText;
-    JTextArea feedbackText;
     String testies = "";
-
+    String s = "";
+    boolean pressed = false;
+    
      //Note: Typically the main method will be in a
     //separate class. As this is a simple one class
     //example it's all in the one class.
@@ -30,7 +30,7 @@ public class InputReader {
              public void run()
              {
                  
-                 new test();         
+                 new InputReader();         
              }
          });
               
@@ -51,8 +51,6 @@ public class InputReader {
         //This JTextArea is used to display information about
         //the keylistener events. It's place in a JScrollPane
         //to allow the scrolling through all the events triggered
-        feedbackText = new JTextArea();
-        JScrollPane scrollText = new JScrollPane(feedbackText);
         
         //This JTextArea will trigger the KeyListener events as
         //long as it hold the focus
@@ -76,21 +74,25 @@ public class InputReader {
                   //String enter = "\n";
                   
                   if(var == KeyEvent.VK_ENTER)
-                	  feedbackText.append("the enter key has been pressed \n");
+                  {
+                	  pressed = true;
+                	  s = testies;
+                	  System.out.println("the enter key has been pressed \n");
+                	  testies = "";
+                  }
+                  else testies = testies.concat(svar);
                   
-                  testies = testies.concat(svar);
                   
                   
-                  
-            	  feedbackText.append("Lets try if this worked!" + testies + "\n");
-            	  feedbackText.append("Key Pressed: " + e.getKeyChar() + "\n");
+            	  //feedbackText.append("Lets try if this worked!" + testies + "\n");
+            	  //feedbackText.append("Key Pressed: " + e.getKeyChar() + "\n");
                
                   
               }
               @Override
               public void keyReleased(KeyEvent e)
               {
-                  feedbackText.append("Key Released: " + e.getKeyChar() + "\n");
+                  //feedbackText.append("Key Released: " + e.getKeyChar() + "\n");
               }
               
               @Override
@@ -99,13 +101,26 @@ public class InputReader {
                   //The getKeyModifiers method is a handy
                   //way to get a String representing the
                   //modifier key.
-                  feedbackText.append("Key Typed: " + e.getKeyChar() + " " + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n");
+                  //feedbackText.append("Key Typed: " + e.getKeyChar() + " " + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n");
               }
         });
      
+        
+        
+        
+        
         guiFrame.add(inputText, BorderLayout.NORTH);
-        guiFrame.add(scrollText, BorderLayout.CENTER);
         guiFrame.setVisible(true);
+    }
+    
+    public String getString()
+    {
+    	if(!pressed) return "";
+    	else
+    	{
+    		pressed = false;
+    		return s;
+    	}
     }
     
 }
