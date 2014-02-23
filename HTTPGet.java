@@ -25,26 +25,22 @@ public class HTTPGet{
 		//Reads in the JSON objects as a single unformatted string.
 		BufferedReader in = new BufferedReader(
 			new InputStreamReader(connection.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-		while((inputLine = in.readLine()) != null){
-			response.append(inputLine);
-		}
+		String reader = in.readLine();
 		in.close();	//Closes the connection.
 
 		// wordCounter is used to limit how many posts/words we want to pull down.
 		// It counts each character in the posts including spaces and punctuation.
 		int wordCounter=0;
-		String reader = response.toString();
 		String result, finalResult="";
 		// This while loop formats the JSON string into a regular plaintext string.
-		while(wordCounter<300){
+		while(wordCounter<900){
 			if(reader.contains("\"body\":")){
 				result = reader.substring(reader.indexOf("\"body\":"),reader.length());
 				reader = reader.substring(reader.indexOf("\"body\":")+6,reader.length());
 				result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
 				result = result.substring(0 , result.indexOf("\\u003C"));
 				result = result.replace("&#8217;","'");
+				result = result.replace("&amp;","&");
 		}
 		else{
 			break;
@@ -61,7 +57,7 @@ public class HTTPGet{
 	// @return result a single massive string containing the text from all posts.
 	public static String getPostsByTag(String tag)throws Exception{
 		// Uses the urlName to get the tumblr blog from which posts will be extracted from. 
-		String url = "http://api.tumblr.com/v2/tagged?tag="+tag;
+		String url = "http://api.tumblr.com/v2/tagged?tag="+tag+"&api_key=FmuYeCbdQesF76ah7RJDMHcYUvrzKV85gWTV0HwtD7JRChh71F";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 		connection.setRequestMethod("GET");
@@ -69,33 +65,42 @@ public class HTTPGet{
 		//Reads in the JSON objects as a single unformatted string.
 		BufferedReader in = new BufferedReader(
 			new InputStreamReader(connection.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-		while((inputLine = in.readLine()) != null){
-			response.append(inputLine);
-		}
+		String reader = in.readLine();
 		in.close();	//Closes the connection.
 
 		// wordCounter is used to limit how many posts/words we want to pull down.
 		// It counts each character in the posts including spaces and punctuation.
 		int wordCounter=0;
-		String reader = response.toString();
-		String result, finalResult="";
+		String result="", finalResult="";
 		// This while loop formats the JSON string into a regular plaintext string.
-		while(wordCounter<300){
-			if(reader.contains("\"body\":")){
-				result = reader.substring(reader.indexOf("\"body\":"),reader.length());
-				reader = reader.substring(reader.indexOf("\"body\":")+6,reader.length());
-				result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
-				result = result.substring(0 , result.indexOf("\\u003C"));
-				result = result.replace("&#8217;","'");
-		}
+		while(wordCounter<400){
+			if(reader.contains("\"body\":") || reader.contains("\"caption\":")){
+				if(reader.contains("\"body\":")){
+					result = reader.substring(reader.indexOf("\"body\":") , reader.length());
+					reader = reader.substring(reader.indexOf("\"body\":")+6 , reader.length());
+					result = result.substring(result.indexOf("\\u003E")+6 , result.indexOf("}"));
+					result = result.substring(0 , result.indexOf("\\u003C"));
+					result = result.replace("&#8217;","'");
+				}
+				if(reader.contains("\"caption\":")){
+					result = reader.substring(reader.indexOf("\"caption\":") , reader.length());
+					reader = reader.substring(reader.indexOf("\"caption\":")+9 , reader.length());
+					
+					result = result.replace("\\u003C" , "<");
+					result = result.replace("\\u003E" , ">");
+					result = result.replace("&#8217;" , "'");
+					result =result.replace("u0022" , "\"");
+					//result = result.substring(result.indexOf("\\u003Cp\\u003E")+13 , result.indexOf("\\u003C\\/p\\u003E"));
+					result = result.substring(result.indexOf("<p>")+3 , result.indexOf("<\\/p>"));
+				}
+			}
 		else{
 			break;
 		}
 
 		wordCounter += result.length();
 		finalResult = finalResult + result + "\n";
+
 		}
 	return finalResult;
 	}	
