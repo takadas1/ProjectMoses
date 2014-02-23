@@ -16,3 +16,6 @@ Shotaro Takada
 Andrew Miller
 Rob Preuss
 Andrew Preuss
+
+Tumblr Blog - http://project-moses.tumblr.com/
+Twitter Page - https://twitter.com/ProjectMoses
